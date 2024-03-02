@@ -14,17 +14,22 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+  userId          String    @id @default(uuid())
+  name            String
+  passwordHash    String
+  userPhoneNumber String    @unique
+  createdAt       DateTime  @default(now())
+  products        Product[]
+
+  @@map("users")
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+model Product {
+  id            String @id @default(uuid())
+  name          String
+  price         Float
+  productUserId String
+  user          User   @relation(fields: [productUserId], references: [userId])
+
+  @@map("products")
 }
