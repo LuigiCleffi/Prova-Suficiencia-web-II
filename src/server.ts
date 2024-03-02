@@ -1,64 +1,16 @@
-import { PrismaClient } from '@prisma/client'
+import { env } from 'env'
 import fastify, { FastifyInstance } from 'fastify'
+import { appRoutes } from 'http/routes'
 
-const prisma = new PrismaClient()
 const app: FastifyInstance = fastify()
-interface IQueryInterface {
-  username: string
-  password: string
-}
-interface IHeaders {
-  'x-access-token': string
-}
-interface IReply {
-  code: number
-  message: string
-  body: unknown
-}
 
-app.get<{ QueryString: IQueryInterface; Headers: IHeaders; Reply: IReply }>(
-  '/',
-  async (request, reply) => {
-    const { username, password } = request.query as IQueryInterface
+app.register(appRoutes)
 
-    return reply.send({
-      code: 200,
-      message: 'Success',
-      body: {
-        username,
-        password,
-      },
-    })
-  },
-)
-
-app.post('/', async (request, reply) => {
-  const { title, content, authorEmail } = request.body as {
-    title: string
-    content: string
-    authorEmail: string
-  }
-  const post = await prisma.post.create({
-    data: {
-      title,
-      content,
-      published: false,
-      author: { connect: { email: authorEmail } },
-    },
+app
+  .listen({
+    host: '0.0.0.0',
+    port: env.PORT,
   })
-
-  reply.send({
-    code: 200,
-    message: 'Success',
-    body: post,
+  .then((value) => {
+    console.log(`🚀 HTTP Server Running ${value}`)
   })
-})
-
-app.listen({ port: 8080 }, (err, address) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
-  console.log('Server starting')
-  console.log(`Server listening at ${address}`)
-})
