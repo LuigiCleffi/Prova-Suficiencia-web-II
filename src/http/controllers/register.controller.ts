@@ -1,11 +1,15 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { registerUseCase } from 'use-cases/register'
+import { PrismaUsersRepository } from 'repositories/prisma/prisma-users-repository'
+import { UserPhoneNumberExistsError } from 'use-cases/errors/user-already-exists.error'
+import { makeRegisterUseCase } from 'use-cases/factories/make-register-use-case'
+import { RegisterUseCase } from 'use-cases/register'
 import { z } from 'zod'
 
 export async function register(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
+
   const registerBodySchema = z.object({
     name: z.string(),
     password: z.string().min(6),
@@ -15,9 +19,18 @@ export async function register(
   const { name, password, phoneNumber } = registerBodySchema.parse(request.body)
 
   try {
-    await registerUseCase({ name, password, phoneNumber })
+    const { registerUseCase } = makeRegisterUseCase()
+
+    await registerUseCase.execute({ name, password, phoneNumber })
   } catch (err) {
-    return reply.status(409).send()
+
+    if (err instanceof UserPhoneNumberExistsError) {
+      return reply.status(409).send({
+        message: err.message
+      })
+    }
+
+    throw err
   }
 
   return reply.status(201).send()
