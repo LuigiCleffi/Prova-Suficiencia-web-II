@@ -1,6 +1,7 @@
+import { UsersRepository } from 'repositories/users-repository'
+import { UserPhoneNumberExistsError } from './errors/user-already-exists.error'
+import { User } from '@prisma/client'
 import { hash } from 'bcryptjs'
-import { prisma } from 'lib/prisma'
-import { PrismaUserRepository } from 'repositories/prisma-users-repository'
 
 interface RegisterUseCaseRequest {
   name: string
@@ -8,28 +9,28 @@ interface RegisterUseCaseRequest {
   phoneNumber?: string
 }
 
-export async function registerUseCase({
-  name,
-  password,
-  phoneNumber,
-}: RegisterUseCaseRequest) {
-  const passwordHash = await hash(password, 6)
+interface RegisterUseCaseResponse {
+  user: User
+}
 
-  const userWithSamePhoneNumber = await prisma.user.findUnique({
-    where: {
-      userPhoneNumber: phoneNumber,
-    },
-  })
+export class RegisterUseCase {
+  constructor(private usersRepository: UsersRepository) { }
 
-  if (userWithSamePhoneNumber) {
-    throw new Error('User with same phone number already exists')
+  async execute({ name, password, phoneNumber }: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
+    const passwordHash = await hash(password, 6)
+
+    const userWithSamePhoneNumber = await this.usersRepository.findByPhoneNumber(phoneNumber ?? '')
+
+    if (userWithSamePhoneNumber) {
+      throw new UserPhoneNumberExistsError()
+    }
+
+    const user = await this.usersRepository.create({
+      name,
+      passwordHash,
+      userPhoneNumber: phoneNumber ?? '',
+    })
+
+    return { user }
   }
-
-  const prismaUsersRepository = new PrismaUserRepository()
-
-  await prismaUsersRepository.create({
-    name,
-    passwordHash,
-    userPhoneNumber: phoneNumber ?? '',
-  })
 }
