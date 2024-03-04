@@ -7,12 +7,12 @@ export async function placeOrder(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
-  const registerBodySchema = z.object({
-    userId: z.string(),
+  const placeOrderBodySchema = z.object({
+    userId: z.number(),
     productId: z.number(),
   })
 
-  const { productId, userId } = registerBodySchema.parse(request.body)
+  const { productId, userId } = placeOrderBodySchema.parse(request.params)
 
   try {
     const { orderUseCase } = makeOrderUseCase()
