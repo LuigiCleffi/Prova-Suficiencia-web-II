@@ -3,7 +3,7 @@ import { OrderRepository } from 'repositories/orders-repository'
 import { ProductAlreadyExistsError } from 'use-cases/errors/products/product-already-exists'
 
 interface OrderUseCaseRequest {
-  userId: string
+  userId: number
   productId: number
 }
 
