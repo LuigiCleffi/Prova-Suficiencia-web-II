@@ -12,7 +12,7 @@ export async function placeOrder(
     productId: z.number(),
   })
 
-  const { productId, userId } = placeOrderBodySchema.parse(request.params)
+  const { productId, userId } = placeOrderBodySchema.parse(request.body)
 
   try {
     const { orderUseCase } = makeOrderUseCase()

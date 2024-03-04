@@ -3,10 +3,16 @@ import { Prisma } from '@prisma/client'
 import { OrderRepository } from 'repositories/orders-repository'
 
 export class PrismaOrdersRepository implements OrderRepository {
-  getProductById(id: number) {
-    return prisma.order.findUnique({
-      where: { id },
-    })
+  // getProductById(id: number) {
+  //   console.log('HERE')
+  //   return prisma.order.findUnique({
+  //     where: { id },
+  //   })
+  // }
+
+  async listOrders() {
+    const findAllOrders = await prisma.order.findMany()
+    return findAllOrders
   }
 
   async placeOrder(data: Prisma.OrderCreateInput) {

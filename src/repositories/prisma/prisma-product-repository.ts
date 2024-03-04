@@ -21,4 +21,13 @@ export class PrismaProductsRepository implements ProductsRepository {
     })
     return products
   }
+
+  async findProductById(id: number) {
+    const product = await prisma.product.findUnique({
+      where: {
+        id,
+      },
+    })
+    return product
+  }
 }
