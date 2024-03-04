@@ -1,8 +1,7 @@
-
-import { UsersRepository } from "repositories/users-repository";
-import { InvalidCredentialError } from "./errors/invalid-credential.error";
-import { compare } from "bcryptjs";
-import { User } from "@prisma/client";
+import { UsersRepository } from 'repositories/users-repository'
+import { InvalidCredentialError } from './errors/invalid-credential.error'
+import { compare } from 'bcryptjs'
+import { User } from '@prisma/client'
 
 interface AuthenticationUseCaseRequest {
   phoneNumber: string
@@ -14,9 +13,12 @@ interface AuthenticationUseCaseResponse {
 }
 
 export class AuthenticationUseCase {
-  constructor(private usersRepository: UsersRepository) { }
+  constructor(private usersRepository: UsersRepository) {}
 
-  async execute({ phoneNumber, password }: AuthenticationUseCaseRequest): Promise<AuthenticationUseCaseResponse> {
+  async execute({
+    phoneNumber,
+    password,
+  }: AuthenticationUseCaseRequest): Promise<AuthenticationUseCaseResponse> {
     const user = await this.usersRepository.findByPhoneNumber(phoneNumber)
     if (!user) {
       throw new InvalidCredentialError()

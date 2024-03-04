@@ -16,11 +16,11 @@ describe('Get User Profile Use Case', () => {
     const createdUser = await usersRepository.create({
       name: 'John Doe',
       userPhoneNumber: '47999999',
-      passwordHash: await hash('123', 6)
+      passwordHash: await hash('123', 6),
     })
 
     const { user } = await sut.execute({
-      userId: createdUser.userId,
+      userId: createdUser.id,
     })
 
     expect(user.name).toEqual('John Doe')

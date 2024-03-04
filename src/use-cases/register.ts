@@ -14,12 +14,17 @@ interface RegisterUseCaseResponse {
 }
 
 export class RegisterUseCase {
-  constructor(private usersRepository: UsersRepository) { }
+  constructor(private usersRepository: UsersRepository) {}
 
-  async execute({ name, password, phoneNumber }: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
+  async execute({
+    name,
+    password,
+    phoneNumber,
+  }: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
     const passwordHash = await hash(password, 6)
 
-    const userWithSamePhoneNumber = await this.usersRepository.findByPhoneNumber(phoneNumber ?? '')
+    const userWithSamePhoneNumber =
+      await this.usersRepository.findByPhoneNumber(phoneNumber ?? '')
 
     if (userWithSamePhoneNumber) {
       throw new UserPhoneNumberExistsError()

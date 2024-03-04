@@ -1,7 +1,7 @@
-import { Prisma, Product, User } from "@prisma/client";
+import { Prisma, Product } from '@prisma/client'
 
 export interface ProductsRepository {
-  create: (data: Prisma.ProductCreateInput) => Promise<Product>,
+  create: (data: Prisma.ProductCreateInput) => Promise<Product>
   listProducts: () => Promise<Product[] | null>
   findProductByName: (name: string) => Promise<Product | null>
 }

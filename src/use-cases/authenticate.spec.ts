@@ -24,10 +24,9 @@ describe('Authenticate use case', () => {
       password: '123456',
     })
 
-    expect(user.userId).toEqual(expect.any(String))
+    expect(user.id).toEqual(expect.any(String))
   })
   it('should not be able to authenticate with wrong phoneNumber', async () => {
-
     expect(() =>
       sut.execute({
         phoneNumber: '123456',
@@ -35,5 +34,4 @@ describe('Authenticate use case', () => {
       }),
     ).rejects.toBeInstanceOf(InvalidCredentialError)
   })
-
 })

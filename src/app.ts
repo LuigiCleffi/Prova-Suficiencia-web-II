@@ -1,22 +1,29 @@
-import { env } from "env"
-import fastify, { FastifyInstance } from "fastify"
-import { appRoutes } from "http/routes"
-import { ZodError } from "zod"
-import fastifySwagger from "@fastify/swagger";
-import fastifySwaggerUi from "@fastify/swagger-ui";
-import { swaggerOptions, swaggerUiOptions } from "swagger";
+import { env } from 'env'
+import fastify, { FastifyInstance } from 'fastify'
+
+import { ZodError } from 'zod'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
+import { swaggerOptions, swaggerUiOptions } from 'swagger'
+
+import { userRoutes } from 'http/controllers/users/routes'
+import { productRoutes } from 'http/controllers/products/routes'
+import { orderRoutes } from 'http/controllers/orders/routes'
 
 export const app: FastifyInstance = fastify()
 
-app.register(fastifySwagger, swaggerOptions);
-app.register(fastifySwaggerUi, swaggerUiOptions);
+app.register(fastifySwagger, swaggerOptions)
+app.register(fastifySwaggerUi, swaggerUiOptions)
 
-app.register(appRoutes)
+app.register(userRoutes)
+app.register(orderRoutes)
+app.register(productRoutes)
 
 app.setErrorHandler((error, _, reply) => {
   if (error instanceof ZodError) {
     return reply.status(400).send({
-      message: 'Validation error', issues: error.format()
+      message: 'Validation error',
+      issues: error.format(),
     })
   }
 
@@ -25,6 +32,6 @@ app.setErrorHandler((error, _, reply) => {
   }
 
   return reply.status(500).send({
-    message: 'Internal Server Error'
+    message: 'Internal Server Error',
   })
 })

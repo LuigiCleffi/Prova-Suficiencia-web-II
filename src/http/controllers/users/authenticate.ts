@@ -7,7 +7,6 @@ export async function authenticate(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
-
   const authenticateBodySchema = z.object({
     phoneNumber: z.string().optional(),
     password: z.string().min(6),
@@ -18,12 +17,14 @@ export async function authenticate(
   try {
     const { authenticateUseCase } = makeAuthenticateUseCase()
 
-    await authenticateUseCase.execute({ phoneNumber: phoneNumber ?? '', password })
+    await authenticateUseCase.execute({
+      phoneNumber: phoneNumber ?? '',
+      password,
+    })
   } catch (err) {
-
     if (err instanceof InvalidCredentialError) {
       return reply.status(409).send({
-        message: err.message
+        message: err.message,
       })
     }
 
