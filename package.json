@@ -4,6 +4,7 @@
   "main": "dist/server.js",
   "license": "MIT",
   "dependencies": {
+    "@fastify/jwt": "8.0.0",
     "@fastify/swagger": "8.14.0",
     "@fastify/swagger-ui": "3.0.0",
     "@prisma/client": "5.10.2",

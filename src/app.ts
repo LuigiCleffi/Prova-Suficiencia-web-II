@@ -9,8 +9,13 @@ import { swaggerOptions, swaggerUiOptions } from 'swagger'
 import { userRoutes } from 'http/controllers/users/routes'
 import { productRoutes } from 'http/controllers/products/routes'
 import { orderRoutes } from 'http/controllers/orders/routes'
+import fastifyJwt from '@fastify/jwt'
 
 export const app: FastifyInstance = fastify()
+
+app.register(fastifyJwt, {
+  secret: env.JWT_SECRET,
+})
 
 app.register(fastifySwagger, swaggerOptions)
 app.register(fastifySwaggerUi, swaggerUiOptions)
