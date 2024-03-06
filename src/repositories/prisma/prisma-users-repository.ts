@@ -30,4 +30,19 @@ export class PrismaUsersRepository implements UsersRepository {
     const user = await prisma.user.create({ data })
     return user
   }
+
+  async delete(id: number) {
+    await prisma.order.deleteMany({
+      where: {
+        userId: id,
+      },
+    })
+
+    const user = await prisma.user.delete({
+      where: {
+        id,
+      },
+    })
+    return user
+  }
 }

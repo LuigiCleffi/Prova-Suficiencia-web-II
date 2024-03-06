@@ -5,4 +5,5 @@ export interface UsersRepository {
   findByPhoneNumber: (phoneNumber: string) => Promise<User | null>
   listUsers: () => Promise<User[] | null>
   findUserById: (id: number) => Promise<User | null>
+  delete: (id: number) => Promise<User>
 }

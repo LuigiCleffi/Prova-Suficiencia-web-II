@@ -14,31 +14,30 @@ datasource db {
 }
 
 model User {
-  id              Int      @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
   name            String
   passwordHash    String
-  userPhoneNumber String   @unique
-  createdAt       DateTime @default(now())
+  userPhoneNumber String  @unique
   products        Order[]
 
   @@map("users")
 }
 
 model Product {
-  id       Int     @id @default(autoincrement())
-  name     String
-  price    Float
-  products Order[]
+  id     Int     @id @default(autoincrement())
+  name   String
+  price  Float
+  orders Order[]
 
   @@map("products")
 }
 
 model Order {
-  id        Int     @id @default(autoincrement())
-  userId    Int
-  user      User    @relation(fields: [userId], references: [id])
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  id       Int       @id @default(autoincrement())
+  userId   Int
+  user     User      @relation(fields: [userId], references: [id])
+  products Product[]
 
-  @@unique([userId, productId])
+  @@unique([userId])
+  @@map("orders")
 }
