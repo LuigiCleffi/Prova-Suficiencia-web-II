@@ -7,6 +7,8 @@ export async function placeOrder(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
+  await request.jwtVerify()
+
   const placeOrderBodySchema = z.object({
     userId: z.number(),
     productIds: z.union([z.array(z.coerce.number()), z.coerce.number()]),
