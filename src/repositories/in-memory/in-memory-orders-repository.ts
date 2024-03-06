@@ -9,7 +9,7 @@ export class InMemoryOrdersRepository implements OrderRepository {
     return this.items
   }
 
-  async getProductById(productId: number): Promise<Order | null> {
+  async verifyOrderExists(productId: number): Promise<Order | null> {
     const order = this.items.find((order) => order.productId === productId)
     if (!order) return null
     return order

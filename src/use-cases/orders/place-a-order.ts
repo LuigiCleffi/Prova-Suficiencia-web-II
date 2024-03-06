@@ -1,44 +1,45 @@
-import { Order } from '@prisma/client'
+import { Order, Product, User } from '@prisma/client'
 import { OrderRepository } from 'repositories/orders-repository'
-// import { ProductAlreadyExistsError } from 'use-cases/errors/products/product-already-exists'
+import { OrderExistsError } from 'use-cases/errors/orders/order-doesnt-exist'
 
 interface OrderUseCaseRequest {
   userId: number
-  productId: number
+  productIds: number[] | number
 }
 
 interface OrderUseCaseResponse {
-  product: Order
+  order: Order
+  user: User
+  products: Product[]
 }
 
 export class PlaceAnOrderUseCase {
-  constructor(private productRepository: OrderRepository) {}
+  constructor(private orderRepository: OrderRepository) {}
 
   async createOrder({
-    productId,
+    productIds,
     userId,
   }: OrderUseCaseRequest): Promise<OrderUseCaseResponse> {
-    // const findProduct = await this.productRepository.getProductById(productId)
-    // console.log('findProduct', findProduct, productId)
+    const user = await this.orderRepository.findUserById(userId)
 
-    // if (!findProduct) {
-    //   // should be product not found
-    //   throw new ProductAlreadyExistsError()
-    // }
+    if (!user) {
+      throw new Error('User not found')
+    }
 
-    const product = await this.productRepository.placeOrder({
-      product: {
-        connect: {
-          id: productId,
-        },
-      },
-      user: {
-        connect: {
-          id: userId,
-        },
-      },
-    })
+    const orderExists = await this.orderRepository.verifyOrderExists(userId)
 
-    return { product }
+    if (orderExists) {
+      throw new OrderExistsError()
+    }
+
+    const order = await this.orderRepository.placeOrder(userId, productIds)
+
+    const products = await this.orderRepository.getProductsForOrder(order.id)
+
+    return {
+      order,
+      user,
+      products: products ?? [],
+    }
   }
 }

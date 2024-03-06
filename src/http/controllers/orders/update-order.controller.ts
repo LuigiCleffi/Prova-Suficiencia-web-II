@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { OrderExistsError } from 'use-cases/errors/orders/order-doesnt-exist'
+import { OrderExistsError } from 'use-cases/errors/products/product-doesnt-exist'
 import { makeOrderUseCase } from 'use-cases/factories/make-order-use-case'
 import { z } from 'zod'
 
@@ -9,7 +9,7 @@ export async function placeOrder(
 ): Promise<void> {
   const placeOrderBodySchema = z.object({
     userId: z.number(),
-    productIds: z.union([z.array(z.coerce.number()), z.coerce.number()]),
+    productIds: z.number().array(),
   })
 
   const { productIds, userId } = placeOrderBodySchema.parse(request.body)
@@ -17,7 +17,7 @@ export async function placeOrder(
   try {
     const { orderUseCase } = makeOrderUseCase()
 
-    await orderUseCase.createOrder({ productIds, userId })
+    await orderUseCase.createOrder({ productIds, userId, products: [] })
   } catch (err) {
     if (err instanceof OrderExistsError) {
       return reply.status(409).send({
@@ -27,7 +27,5 @@ export async function placeOrder(
     throw err
   }
 
-  return reply.status(201).send({
-    message: 'Order placed successfully',
-  })
+  return reply.status(201).send()
 }

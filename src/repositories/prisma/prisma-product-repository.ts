@@ -8,6 +8,15 @@ export class PrismaProductsRepository implements ProductsRepository {
     return product
   }
 
+  async delete(id: number) {
+    const product = await prisma.product.delete({
+      where: {
+        id,
+      },
+    })
+    return product
+  }
+
   async listProducts() {
     const findAllProducts = await prisma.product.findMany()
     return findAllProducts

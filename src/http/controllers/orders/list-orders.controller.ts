@@ -9,7 +9,21 @@ export async function listOrders(
     const orderRepository = new PrismaOrdersRepository()
     const orders = await orderRepository.listOrders()
 
-    reply.send(orders)
+    const ordersWithUserDetailsAndProducts = await Promise.all(
+      orders.map(async (order) => {
+        const user = await orderRepository.findUserById(order.userId)
+        const products = await orderRepository.getProductsForOrder(order.id)
+
+        return {
+          ...order,
+          userId: order.userId,
+          userName: user?.name ?? '',
+          userPhoneNumber: user?.userPhoneNumber ?? '',
+          products: products ?? [],
+        }
+      }),
+    )
+    reply.send(ordersWithUserDetailsAndProducts)
   } catch (err) {
     if (err instanceof Error) {
       return reply.status(500).send({
