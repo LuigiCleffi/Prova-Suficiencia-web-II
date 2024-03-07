@@ -1,25 +1,26 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { OrderExistsError } from 'use-cases/errors/products/product-doesnt-exist'
-import { makeOrderUseCase } from 'use-cases/factories/make-order-use-case'
+import { OrderDoesntExistError } from 'use-cases/errors/orders/order-doesnt-exist'
+import { makeOrderUpdateUseCase } from 'use-cases/factories/make-order-update-use-case'
 import { z } from 'zod'
 
-export async function placeOrder(
+export async function updateOrder(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
-  const placeOrderBodySchema = z.object({
-    userId: z.number(),
-    productIds: z.number().array(),
+  const updateOrderBodySchema = z.object({
+    userId: z.coerce.number(),
+    productIds: z.union([z.array(z.coerce.number()), z.coerce.number()]),
   })
 
-  const { productIds, userId } = placeOrderBodySchema.parse(request.body)
+  await request.jwtVerify()
+
+  const { productIds, userId } = updateOrderBodySchema.parse(request.body)
 
   try {
-    const { orderUseCase } = makeOrderUseCase()
-
-    await orderUseCase.createOrder({ productIds, userId, products: [] })
+    const { updateOrderUseCase } = makeOrderUpdateUseCase()
+    await updateOrderUseCase.updateOrder({ productIds, userId })
   } catch (err) {
-    if (err instanceof OrderExistsError) {
+    if (err instanceof OrderDoesntExistError) {
       return reply.status(409).send({
         message: err.message,
       })
@@ -27,5 +28,5 @@ export async function placeOrder(
     throw err
   }
 
-  return reply.status(201).send()
+  return reply.status(200).send()
 }

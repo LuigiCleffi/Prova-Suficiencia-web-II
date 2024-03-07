@@ -27,7 +27,7 @@ export async function removeProduct(
     throw err
   }
 
-  return reply.status(201).send({
+  return reply.status(204).send({
     message: 'Product removed successfully',
   })
 }

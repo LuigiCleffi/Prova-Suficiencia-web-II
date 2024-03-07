@@ -3,24 +3,24 @@ import { OrderRepository } from 'repositories/orders-repository'
 import { OrderDoesntExistError } from 'use-cases/errors/orders/order-doesnt-exist'
 import { UserDoesntExistError } from 'use-cases/errors/user-doesnt-exitst'
 
-interface OrderUseCaseRequest {
+interface UpdateOrderUseCaseRequest {
   userId: number
   productIds: number[] | number
 }
 
-interface OrderUseCaseResponse {
+interface UpdateOrderUseCaseResponse {
   order: Order
   user: User
   products: Product[]
 }
 
-export class PlaceAnOrderUseCase {
+export class UpdateOrderUseCase {
   constructor(private orderRepository: OrderRepository) {}
 
-  async createOrder({
+  async updateOrder({
     productIds,
     userId,
-  }: OrderUseCaseRequest): Promise<OrderUseCaseResponse> {
+  }: UpdateOrderUseCaseRequest): Promise<UpdateOrderUseCaseResponse> {
     const user = await this.orderRepository.findUserById(userId)
 
     if (!user) {
@@ -29,11 +29,11 @@ export class PlaceAnOrderUseCase {
 
     const orderExists = await this.orderRepository.verifyOrderExists(userId)
 
-    if (orderExists) {
+    if (!orderExists) {
       throw new OrderDoesntExistError()
     }
 
-    const order = await this.orderRepository.placeOrder(userId, productIds)
+    const order = await this.orderRepository.updateOrder(userId, productIds)
 
     const products = await this.orderRepository.getProductsForOrder(order.id)
 

@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { OrderExistsError } from 'use-cases/errors/orders/order-doesnt-exist'
+import { OrderDoesntExistError } from 'use-cases/errors/orders/order-doesnt-exist'
 import { makeOrderUseCase } from 'use-cases/factories/make-order-use-case'
 import { z } from 'zod'
 
@@ -21,7 +21,7 @@ export async function placeOrder(
 
     await orderUseCase.createOrder({ productIds, userId })
   } catch (err) {
-    if (err instanceof OrderExistsError) {
+    if (err instanceof OrderDoesntExistError) {
       return reply.status(409).send({
         message: err.message,
       })

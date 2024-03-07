@@ -41,10 +41,47 @@ export class PrismaOrdersRepository implements OrderRepository {
     return findAllOrders
   }
 
+  async delete(orderId: number) {
+    const order = await prisma.order.delete({
+      where: {
+        id: orderId,
+      },
+    })
+
+    return order
+  }
+
+  async findOrderById(id: number) {
+    const order = await prisma.order.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    return order
+  }
+
   async placeOrder(userId: number, productIds: number[] | number) {
     const order = await prisma.order.create({
       data: {
         userId,
+        products: {
+          connect: Array.isArray(productIds)
+            ? productIds.map((id) => ({ id }))
+            : [{ id: productIds }],
+        },
+      },
+    })
+
+    return order
+  }
+
+  async updateOrder(userId: number, productIds: number[] | number) {
+    const order = await prisma.order.update({
+      where: {
+        userId,
+      },
+      data: {
         products: {
           connect: Array.isArray(productIds)
             ? productIds.map((id) => ({ id }))
